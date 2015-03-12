@@ -1,14 +1,15 @@
-﻿/// add reference to System.Messaging
-/// using System.Messaging;
+﻿/// Add reference to System.Messaging
+///  and   Using System.Messaging;
 /// Make sure the Message Queuing (MSMQ) Windows Serivce installed and running.
-/// Create queue
+/// Create a queue
+/// Add queue address to config file. It looks like: ".\private$\queuebenchmark"
 
 using System;
 using System.Configuration;
 using System.Messaging;
 
 
-namespace GLD.QueueBenchmark.Queues
+namespace GLD.QueueBenchmark
 {
     internal class Msmq : IQueue
     {

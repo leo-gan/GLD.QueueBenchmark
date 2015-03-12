@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GLD.QueueBenchmark.Queues;
 
 namespace GLD.QueueBenchmark
 {
@@ -15,6 +14,7 @@ namespace GLD.QueueBenchmark
             var queues = new Dictionary<string, IQueue>
             {
                 {"MSMQ", new Msmq()},
+                {"NetMQ", new NetMQ()},
             };
             Tester.SendTests(repetitions, bufferSize, queues);
         }

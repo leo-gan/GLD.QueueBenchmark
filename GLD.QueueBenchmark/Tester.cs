@@ -26,8 +26,9 @@ namespace GLD.QueueBenchmark
             foreach (var queue in queues)
                 measurements[queue.Key] = new long[repetitions];
 
-            var original = new TestBuffer(bufferSize); // the same data for all queues
             for (int i = 0; i < repetitions; i++)
+            {
+                var original = new TestBuffer(bufferSize); // the same data for all queues
                 foreach (var queue in queues)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
@@ -39,6 +40,7 @@ namespace GLD.QueueBenchmark
                     //errors[0] = queue.Key + errors[0];
                     //ReportErrors(errors);
                 }
+            }
             ReportAllResults(measurements);
         }
 
