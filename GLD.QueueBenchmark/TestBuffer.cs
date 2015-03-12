@@ -7,16 +7,7 @@ namespace GLD.QueueBenchmark
     {
         public TestBuffer(int bufferSize)
         {
-            Buffer = new byte[bufferSize];
-
-            byte[] guid = Guid.NewGuid().ToByteArray();
-            for (int i = 0; i < guid.Length; i++)
-            {
-                Buffer[i] = guid[i];
-                if (bufferSize <= guid.Length) return;
-            }
-            for (int i = guid.Length; i < bufferSize; i++)
-                Buffer[i] = (byte) 'a';
+            Buffer = Randomizer.GetByteBuffer(bufferSize);
         }
 
         public byte[] Buffer { set; get; }

@@ -38,7 +38,8 @@ namespace GLD.QueueBenchmark
 
         public void Send(byte[] buffer)
         {
-            _db.ListLeftPush(_queueName, (RedisValue)buffer, When.Always, CommandFlags.None);
+            // TODO: Async operation is much faster, but does it keep  the Ordered Delivery?
+            _db.ListLeftPushAsync(_queueName, (RedisValue)buffer, When.Always, CommandFlags.None);
         }
 
         #endregion

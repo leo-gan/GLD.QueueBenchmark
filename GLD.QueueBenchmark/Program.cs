@@ -13,6 +13,7 @@ namespace GLD.QueueBenchmark
             Console.WriteLine("Buffer Size: " + bufferSize);
             var queues = new Dictionary<string, IQueue>
             {
+                {"Azure Queue", new AzureQueue()},
                 {"MSMQ", new Msmq()},
                 {"NetMQ", new NetMQ()},
                 {"StackExchange Redis", new StackExchangeRedis()},
