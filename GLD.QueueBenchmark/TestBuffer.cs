@@ -10,6 +10,11 @@ namespace GLD.QueueBenchmark
             Buffer = Randomizer.GetByteBuffer(bufferSize);
         }
 
+        public TestBuffer(int bufferSize, int id)
+        {
+            Buffer = Randomizer.GetNumberedByteBuffer(bufferSize, id);
+        }
+
         public byte[] Buffer { set; get; }
 
         public List<string> Compare(byte[] comparable)

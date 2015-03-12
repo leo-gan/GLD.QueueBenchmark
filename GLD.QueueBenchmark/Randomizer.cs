@@ -110,10 +110,10 @@ namespace GLD.QueueBenchmark
         /// <summary>
         /// It writes the id in byte[] format to the beginning of the buffer.
         /// </summary>
-        /// <param name="id">It might be a sequencial number for the message sequence.</param>
         /// <param name="wholeBufferLenght">It could not be shorter than 4 bytes.</param>
+        /// <param name="id">It might be a sequencial number for the message sequence.</param>
         /// <returns></returns>
-        public static byte[] GetNumberedByteBuffer(int id, int wholeBufferLenght)
+        public static byte[] GetNumberedByteBuffer(int wholeBufferLenght, int id)
         {
             var buffer = new byte[wholeBufferLenght];
             var sequencialNumberBytes = BitConverter.GetBytes(id); // gets 4 bytes
