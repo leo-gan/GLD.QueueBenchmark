@@ -38,7 +38,7 @@ namespace GLD.QueueBenchmark
 
         public void Send(byte[] buffer)
         {
-            _db.ListLeftPush(_queueName, buffer, When.Always, CommandFlags.None);
+            _db.ListLeftPush(_queueName, (RedisValue)buffer, When.Always, CommandFlags.None);
         }
 
         #endregion
