@@ -15,6 +15,7 @@ namespace GLD.QueueBenchmark
             {
                 {"MSMQ", new Msmq()},
                 {"NetMQ", new NetMQ()},
+                {"StackExchange Redis", new StackExchangeRedis()},
             };
             Tester.SendTests(repetitions, bufferSize, queues);
         }
