@@ -1,8 +1,7 @@
 ﻿namespace GLD.QueueBenchmark
 {
-    internal interface IQueue
+    internal interface IQueueSender
     {
-        byte[] Receive();
         void Send(byte[] buffer);
     }
 }

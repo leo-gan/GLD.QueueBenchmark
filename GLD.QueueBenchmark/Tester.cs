@@ -20,7 +20,7 @@ namespace GLD.QueueBenchmark
     internal class Tester
     {
         public static void SendTests(int repetitions, int bufferSize,
-                                     Dictionary<string, IQueue> queues)
+                                     Dictionary<string, IQueueSender> queues)
         {
             var measurements = new Dictionary<string, long[]>();
             foreach (var queue in queues)
@@ -63,7 +63,7 @@ namespace GLD.QueueBenchmark
 
         private static void ReportTestResultHeader()
         {
-            const string header = "Serializer:          Time: Avg,    Max ticks   \n"
+            const string header =   "Queue Sender:        Time: Avg,    Max ticks   \n"
                                   + "===============================================";
 
             Console.WriteLine(header);

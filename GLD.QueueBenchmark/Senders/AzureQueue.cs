@@ -4,15 +4,13 @@
 // Create the Manage, Send and Listen policies
 // Copy the policies from the ServiceBus configuration page into the config files of the sender and receiver applications
 
-using System;
 using System.Configuration;
 using System.IO;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
-namespace GLD.QueueBenchmark
+namespace GLD.QueueBenchmark.Senders
 {
-    internal class AzureQueue : IQueue
+    internal class AzureQueue : IQueueSender
     {
         private readonly QueueClient _client;
 
@@ -20,29 +18,25 @@ namespace GLD.QueueBenchmark
         {
             //NamespaceManager namespaceManager = NamespaceManager.CreateFromConnectionString(
             //    ConfigurationManager.AppSettings[
-            //        "GLD.QueueBenchmark.AzureQueue.ManageConnectionString"]);
+            //        "AzureQueue.ManageConnectionString"]);
             string queueName =
-                ConfigurationManager.AppSettings["GLD.QueueBenchmark.AzureQueue.QueueName"];
+                ConfigurationManager.AppSettings["AzureQueue.QueueName"];
             //if (!namespaceManager.QueueExists(queueName))
             //    namespaceManager.CreateQueue(queueName);
             _client = QueueClient.CreateFromConnectionString(
                 ConfigurationManager.AppSettings[
-                    "GLD.QueueBenchmark.AzureQueue.SendConnectionString"], queueName);
+                    "AzureQueue.SendConnectionString"], queueName);
         }
 
-        #region IQueue Members
-
-        public byte[] Receive()
-        {
-            throw new NotImplementedException();
-        }
+        #region IQueueSender Members
 
         public void Send(byte[] buffer)
         {
-            using(var stream = new MemoryStream(buffer))
+            using (var stream = new MemoryStream(buffer))
             {
                 var brokeredMsg = new BrokeredMessage(stream);
                 _client.SendAsync(brokeredMsg);
+                //_client.Send(brokeredMsg);
             }
         }
 

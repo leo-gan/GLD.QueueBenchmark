@@ -59,13 +59,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IQueue.cs" />
+    <Compile Include="IQueueReceiver.cs" />
+    <Compile Include="IQueueSender.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queues\AzureQueue.cs" />
-    <Compile Include="Queues\StackExchangeRedis.cs" />
-    <Compile Include="Queues\NetMQ.cs" />
-    <Compile Include="Queues\Msmq.cs" />
+    <Compile Include="Receivers\AzureQueue.cs" />
+    <Compile Include="Receivers\AzureTopic.cs" />
+    <Compile Include="Receivers\Msmq.cs" />
+    <Compile Include="Receivers\NetMQ.cs" />
+    <Compile Include="Receivers\StackExchangeRedis.cs" />
+    <Compile Include="Senders\AzureTopic.cs" />
+    <Compile Include="Senders\AzureQueue.cs" />
+    <Compile Include="Senders\StackExchangeRedis.cs" />
+    <Compile Include="Senders\NetMQ.cs" />
+    <Compile Include="Senders\Msmq.cs" />
     <Compile Include="Randomizer.cs" />
     <Compile Include="TestBuffer.cs" />
     <Compile Include="Tester.cs" />

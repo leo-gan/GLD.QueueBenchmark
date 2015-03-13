@@ -16,7 +16,6 @@ namespace GLD.QueueBenchmark
 
         public static Random Rand = new Random();
 
-
         public static string Name
         {
             get { return GetCapitalChar() + Word; }
@@ -26,9 +25,9 @@ namespace GLD.QueueBenchmark
         {
             get
             {
-                var wordLenght = GetWordLenght();
+                int wordLenght = GetWordLenght();
                 var sb = new StringBuilder(wordLenght);
-                for (var i = 0; i < wordLenght; i++)
+                for (int i = 0; i < wordLenght; i++)
                     sb.Append(GetChar());
                 return sb.ToString();
             }
@@ -38,9 +37,9 @@ namespace GLD.QueueBenchmark
         {
             get
             {
-                var wordLenght = GetIdLenght();
+                int wordLenght = GetIdLenght();
                 var sb = new StringBuilder(wordLenght);
-                for (var i = 0; i < wordLenght; i++)
+                for (int i = 0; i < wordLenght; i++)
                     sb.Append(GetDigit());
                 return sb.ToString();
             }
@@ -50,10 +49,10 @@ namespace GLD.QueueBenchmark
         {
             get
             {
-                var phraseLenght = GetPhraseLenght();
+                int phraseLenght = GetPhraseLenght();
                 var sb = new StringBuilder(phraseLenght);
                 sb.Append(Name);
-                for (var i = 0; i < phraseLenght; i++)
+                for (int i = 0; i < phraseLenght; i++)
                     sb.Append(Word + GetPunctuation());
                 return sb.ToString();
             }
@@ -102,13 +101,14 @@ namespace GLD.QueueBenchmark
         public static byte[] GetByteBuffer(int bufferLenght)
         {
             var buffer = new byte[bufferLenght];
-            for (var i = 0; i < bufferLenght; i++)
-                buffer[i] = (byte)Rand.Next((int)' ', (int)'~'); // Space to '~' symbols cover the printable ASCII symbols
+            for (int i = 0; i < bufferLenght; i++)
+                buffer[i] = (byte) Rand.Next(' ', '~');
+                    // Space to '~' symbols cover the printable ASCII symbols
             return buffer;
         }
 
         /// <summary>
-        /// It writes the id in byte[] format to the beginning of the buffer.
+        ///     It writes the id in byte[] format to the beginning of the buffer.
         /// </summary>
         /// <param name="wholeBufferLenght">It could not be shorter than 4 bytes.</param>
         /// <param name="id">It might be a sequencial number for the message sequence.</param>
@@ -116,9 +116,10 @@ namespace GLD.QueueBenchmark
         public static byte[] GetNumberedByteBuffer(int wholeBufferLenght, int id)
         {
             var buffer = new byte[wholeBufferLenght];
-            var sequencialNumberBytes = BitConverter.GetBytes(id); // gets 4 bytes
-            sequencialNumberBytes.CopyTo(buffer,0);
-            var randomPartOfBuffer = GetByteBuffer(wholeBufferLenght - sequencialNumberBytes.Length);
+            byte[] sequencialNumberBytes = BitConverter.GetBytes(id); // gets 4 bytes
+            sequencialNumberBytes.CopyTo(buffer, 0);
+            byte[] randomPartOfBuffer =
+                GetByteBuffer(wholeBufferLenght - sequencialNumberBytes.Length);
             randomPartOfBuffer.CopyTo(buffer, sequencialNumberBytes.Length);
             return buffer;
         }
