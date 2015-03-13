@@ -25,8 +25,7 @@ namespace GLD.QueueBenchmark.Receivers
                 "AzureTopic.SubscriptionName"];
             _client = SubscriptionClient.CreateFromConnectionString(
                 ConfigurationManager.AppSettings[
-                    "AzureTopic.ListenConnectionString"], _topicName,
-                subscriptionName, ReceiveMode.ReceiveAndDelete);
+                    "AzureTopic.ListenConnectionString"], _topicName, subscriptionName);
         }
 
         #region IQueueReceiver Members
@@ -39,17 +38,16 @@ namespace GLD.QueueBenchmark.Receivers
             {
                 brokeredMsg = _client.Receive(new TimeSpan(0, 0, 1));
                 if (brokeredMsg == null) return null;
-                using (var bodyStream = brokeredMsg.GetBody<MemoryStream>())
-                {
-                    buffer = bodyStream.GetBuffer();
-                }
-
+                //using (var bodyStream = brokeredMsg.GetBody<MemoryStream>())
+                //{
+                //    buffer = bodyStream.GetBuffer();
+                //}
+                buffer = brokeredMsg.GetBody<byte[]>();
                 brokeredMsg.Complete();
             }
             catch (Exception ex)
             {
-                if (brokeredMsg != null)
-                    brokeredMsg.Abandon();
+                Trace.Write("Exception ****** " + ex.Message);
                 throw;
             }
             return buffer;

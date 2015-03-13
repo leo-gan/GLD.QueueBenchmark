@@ -28,12 +28,13 @@ namespace GLD.QueueBenchmark.Senders
 
         public void Send(byte[] buffer)
         {
-            using (var stream = new MemoryStream(buffer))
-            {
-                var brokeredMsg = new BrokeredMessage(stream);
-                _client.SendAsync(brokeredMsg);
-                //_client.Send(brokeredMsg);
-            }
+            //using (var stream = new MemoryStream(buffer))
+            //{
+            //    var brokeredMsg = new BrokeredMessage(stream);
+            //    _client.SendAsync(brokeredMsg);
+            //    //_client.Send(brokeredMsg);
+            //}
+            _client.SendAsync(new BrokeredMessage(buffer));
         }
 
         #endregion

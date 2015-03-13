@@ -19,8 +19,8 @@ namespace GLD.QueueBenchmark
 
     internal class Tester
     {
-        public static byte[][] SendTests(int repetitions, int bufferSize,
-                                     Dictionary<string, IQueueSender> queues)
+        public static byte[][] SendTests(string operation, int repetitions, int bufferSize,
+                                         Dictionary<string, IQueueSender> queues)
         {
             var testBuffers = new byte[repetitions][];
             var measurements = new Dictionary<string, long[]>();
@@ -29,50 +29,56 @@ namespace GLD.QueueBenchmark
 
             for (int i = 0; i < repetitions; i++)
             {
-                testBuffers[i] = TestBuffer.GetBuffer(bufferSize); 
+                testBuffers[i] = TestBuffer.GetBuffer(bufferSize, i);
                 foreach (var queue in queues)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
                     queue.Value.Send(testBuffers[i]);
                     sw.Stop();
                     measurements[queue.Key][i] = sw.ElapsedTicks;
-                    Trace.WriteLine(queue.Key + ": " + sw.ElapsedTicks);
+                    Trace.WriteLine(String.Format("{0,10}: {1,20}: {2,11:N0}", i, queue.Key,
+                        sw.ElapsedTicks));
                 }
             }
-            ReportMeasurments(measurements);
+            ReportMeasurments(operation, measurements);
             return testBuffers;
         }
+
         public static void PurgeQueue(Dictionary<string, IQueueReceiver> receivers)
         {
             foreach (var receiver in receivers)
                 receiver.Value.Purge();
         }
 
-        public static byte[][] ReceiveTests(int repetitions, int bufferSize,
-                                        Dictionary<string, IQueueReceiver> queues)
+        public static Dictionary<string, byte[][]> ReceiveTests(string operation, int repetitions, int bufferSize,
+                                                                Dictionary<string, IQueueReceiver>
+                                                                    queues)
         {
-            var testBuffers = new byte[repetitions][];
+            var testBuffers = new Dictionary<string, byte[][]>();
             var measurements = new Dictionary<string, long[]>();
             foreach (var queue in queues)
+            {
+                testBuffers.Add(queue.Key, new byte[repetitions][]);
                 measurements[queue.Key] = new long[repetitions];
+            }
 
             for (int i = 0; i < repetitions; i++)
-            {
                 foreach (var queue in queues)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    testBuffers[i] = queue.Value.Receive();
+                    testBuffers[queue.Key].SetValue(queue.Value.Receive(), i);
                     sw.Stop();
                     measurements[queue.Key][i] = sw.ElapsedTicks;
-                    Trace.WriteLine(i + ":\t" + queue.Key + ": " + sw.ElapsedTicks);
+                    Trace.WriteLine(String.Format("{0,10}: {1,20}: {2,11:N0}", i, queue.Key,
+                        sw.ElapsedTicks));
                 }
-            }
-            ReportMeasurments(measurements);
+            ReportMeasurments(operation, measurements);
             return testBuffers;
         }
-        private static void ReportMeasurments(Dictionary<string, long[]> measurements)
+
+        private static void ReportMeasurments(string operation, Dictionary<string, long[]> measurements)
         {
-            ReportHeader();
+            ReportHeader(operation);
             foreach (var oneTestMeasurments in measurements)
                 ReportMeasurment(oneTestMeasurments);
         }
@@ -87,10 +93,11 @@ namespace GLD.QueueBenchmark
             Trace.WriteLine(report);
         }
 
-        private static void ReportHeader()
+        private static void ReportHeader(string operation)
         {
-            const string header =   "Queue:             Time, ticks: Avg,        Min,          Max\n"
-                                  + "=============================================================";
+             string header = "\n" + operation 
+                            + "\nQueue:             Time, ticks: Avg,        Min,          Max\n"
+                            + "=============================================================";
 
             Console.WriteLine(header);
             Trace.WriteLine(header);
@@ -111,6 +118,7 @@ namespace GLD.QueueBenchmark
             if (times == null || times.Length == 0) return 0;
             return times.Max();
         }
+
         private static double MinTime(long[] times)
         {
             if (times == null || times.Length == 0) return 0;
@@ -135,6 +143,47 @@ namespace GLD.QueueBenchmark
             return ((double) totalTime)/(count - discardCount);
         }
 
- 
+        public static void ResultIs(byte[][] sentOriginal,
+                                    Dictionary<string, byte[][]> receivedResults)
+        {
+            foreach (var result in receivedResults)
+            {
+                Array.Sort(result.Value, new ByteArrayComparer()); // it could be unordered!
+                for (int i = 0; i < result.Value.Length; i++)
+                    ReportErrors(TestBuffer.Compare(result.Key + "[" + i + "]", sentOriginal[i],
+                        result.Value[i]));
+            }
+        }
+    }
+
+    internal class ByteArrayComparer : IComparer<byte[]>
+    {
+        #region IComparer<byte[]> Members
+
+        public int Compare(byte[] x, byte[] y)
+        {
+            if (x.Length > y.Length) return 1;
+            if (x.Length < y.Length) return -1;
+            // first  bytes 4 used to store the array id. We try to sort by this id first.
+            if (x.Length < 4) // array without id:
+            {
+                for (int i = 0; i < x.Length; i++)
+                    if (x[i] > y[i]) return 1;
+                    else if (x[i] < y[i]) return -1;
+                return 0;
+            }
+            int xId = BitConverter.ToInt32(x, 0);
+            int yId = BitConverter.ToInt32(y, 0);
+            if (xId > yId) return 1;
+            if (xId < yId) return -1;
+
+            // if id-s are equal (it is not good), compary all other bytes:
+            for (int i = 4; i < x.Length; i++)
+                if (x[i] > y[i]) return 1;
+                else if (x[i] < y[i]) return -1;
+            return 0;
+        }
+
+        #endregion
     }
 }

@@ -29,8 +29,9 @@ namespace GLD.QueueBenchmark
                 {"StackExchange Redis", new Receivers.StackExchangeRedis()},
             };
             Tester.PurgeQueue(receivers);
-            Tester.SendTests(repetitions, bufferSize, senders);
-            Tester.ReceiveTests(repetitions, bufferSize, receivers);
+            var sentOriginal = Tester.SendTests("Sending", repetitions, bufferSize, senders);
+            var receivedResult = Tester.ReceiveTests("Receiving", repetitions, bufferSize, receivers);
+            Tester.ResultIs(sentOriginal, receivedResult);
         }
     }
 }

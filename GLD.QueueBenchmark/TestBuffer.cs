@@ -15,12 +15,12 @@ namespace GLD.QueueBenchmark
             return Randomizer.GetNumberedByteBuffer(bufferSize, id);
         }
 
-        public static List<string> Compare(byte[] original,  byte[] result)
+        public static List<string> Compare(string queueName, byte[] original,  byte[] result)
         {
-            var errors = new List<string> {"  ************** Comparison failed! "};
+            var errors = new List<string> {queueName + ":  ************** Comparison failed! "};
             if (result == null)
             {
-                errors.Add("\tcomparable: is null!");
+                errors.Add("\tcomparable: is null!"); 
                 return errors;
             }
 
