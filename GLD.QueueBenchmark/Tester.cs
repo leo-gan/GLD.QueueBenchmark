@@ -19,52 +19,78 @@ namespace GLD.QueueBenchmark
 
     internal class Tester
     {
-        public static void SendTests(int repetitions, int bufferSize,
+        public static byte[][] SendTests(int repetitions, int bufferSize,
                                      Dictionary<string, IQueueSender> queues)
         {
+            var testBuffers = new byte[repetitions][];
             var measurements = new Dictionary<string, long[]>();
             foreach (var queue in queues)
                 measurements[queue.Key] = new long[repetitions];
 
             for (int i = 0; i < repetitions; i++)
             {
-                var original = new TestBuffer(bufferSize); // the same data for all queues
+                testBuffers[i] = TestBuffer.GetBuffer(bufferSize); 
                 foreach (var queue in queues)
                 {
                     Stopwatch sw = Stopwatch.StartNew();
-                    queue.Value.Send(original.Buffer);
+                    queue.Value.Send(testBuffers[i]);
                     sw.Stop();
                     measurements[queue.Key][i] = sw.ElapsedTicks;
                     Trace.WriteLine(queue.Key + ": " + sw.ElapsedTicks);
-                    //List<string> errors = original.Compare(processed);
-                    //errors[0] = queue.Key + errors[0];
-                    //ReportErrors(errors);
                 }
             }
-            ReportAllResults(measurements);
+            ReportMeasurments(measurements);
+            return testBuffers;
+        }
+        public static void PurgeQueue(Dictionary<string, IQueueReceiver> receivers)
+        {
+            foreach (var receiver in receivers)
+                receiver.Value.Purge();
         }
 
-        private static void ReportAllResults(Dictionary<string, long[]> measurements)
+        public static byte[][] ReceiveTests(int repetitions, int bufferSize,
+                                        Dictionary<string, IQueueReceiver> queues)
         {
-            ReportTestResultHeader();
+            var testBuffers = new byte[repetitions][];
+            var measurements = new Dictionary<string, long[]>();
+            foreach (var queue in queues)
+                measurements[queue.Key] = new long[repetitions];
+
+            for (int i = 0; i < repetitions; i++)
+            {
+                foreach (var queue in queues)
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    testBuffers[i] = queue.Value.Receive();
+                    sw.Stop();
+                    measurements[queue.Key][i] = sw.ElapsedTicks;
+                    Trace.WriteLine(i + ":\t" + queue.Key + ": " + sw.ElapsedTicks);
+                }
+            }
+            ReportMeasurments(measurements);
+            return testBuffers;
+        }
+        private static void ReportMeasurments(Dictionary<string, long[]> measurements)
+        {
+            ReportHeader();
             foreach (var oneTestMeasurments in measurements)
-                ReportTestResult(oneTestMeasurments);
+                ReportMeasurment(oneTestMeasurments);
         }
 
-        private static void ReportTestResult(KeyValuePair<string, long[]> oneTestMeasurements)
+        private static void ReportMeasurment(KeyValuePair<string, long[]> oneTestMeasurements)
         {
-            string report = String.Format("{0, -20}  {1,9:N0} {2,11:N0}",
+            string report = String.Format("{0, -20}    {1,11:N0}  {2,11:N0}  {3,11:N0}",
                 oneTestMeasurements.Key, AverageTime(oneTestMeasurements.Value),
-                MaxTime(oneTestMeasurements.Value));
+                MinTime(oneTestMeasurements.Value), MaxTime(oneTestMeasurements.Value));
 
             Console.WriteLine(report);
             Trace.WriteLine(report);
         }
 
-        private static void ReportTestResultHeader()
+        private static void ReportHeader()
         {
-            const string header =   "Queue Sender:        Time: Avg,    Max ticks   \n"
-                                  + "===============================================";
+            const string header =   "Queue:             Time, ticks: Avg,        Min,          Max\n"
+                                  + "=============================================================";
 
             Console.WriteLine(header);
             Trace.WriteLine(header);
@@ -80,14 +106,18 @@ namespace GLD.QueueBenchmark
             }
         }
 
-        public static double MaxTime(long[] times)
+        private static double MaxTime(long[] times)
         {
             if (times == null || times.Length == 0) return 0;
-            long max = times.Max();
-            return max;
+            return times.Max();
+        }
+        private static double MinTime(long[] times)
+        {
+            if (times == null || times.Length == 0) return 0;
+            return times.Min();
         }
 
-        public static double AverageTime(long[] times)
+        private static double AverageTime(long[] times)
         {
             // Calculate the average times discarding
             // the 5% min and 5% max test times
@@ -104,5 +134,7 @@ namespace GLD.QueueBenchmark
 
             return ((double) totalTime)/(count - discardCount);
         }
+
+ 
     }
 }

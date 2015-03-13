@@ -5,39 +5,37 @@ namespace GLD.QueueBenchmark
 {
     internal class TestBuffer
     {
-        public TestBuffer(int bufferSize)
+        public static byte[] GetBuffer(int bufferSize)
         {
-            Buffer = Randomizer.GetByteBuffer(bufferSize);
+            return Randomizer.GetByteBuffer(bufferSize);
         }
 
-        public TestBuffer(int bufferSize, int id)
+        public static byte[] GetBuffer(int bufferSize, int id)
         {
-            Buffer = Randomizer.GetNumberedByteBuffer(bufferSize, id);
+            return Randomizer.GetNumberedByteBuffer(bufferSize, id);
         }
 
-        public byte[] Buffer { set; get; }
-
-        public List<string> Compare(byte[] comparable)
+        public static List<string> Compare(byte[] original,  byte[] result)
         {
             var errors = new List<string> {"  ************** Comparison failed! "};
-            if (comparable == null)
+            if (result == null)
             {
                 errors.Add("\tcomparable: is null!");
                 return errors;
             }
 
-            if (Buffer.Length != comparable.Length)
+            if (original.Length != result.Length)
             {
-                errors.Add(String.Format("\tBuffer.Length({0}) != comparable.Length({1})",
-                    Buffer.Length, comparable.Length));
+                errors.Add(String.Format("\toriginal.Length({0}) != result.Length({1})",
+                    original.Length, result.Length));
                 return errors;
             }
 
-            for (int i = 0; i < Buffer.Length; i++)
-                if (Buffer[i] != comparable[i])
+            for (int i = 0; i < original.Length; i++)
+                if (original[i] != result[i])
                 {
-                    errors.Add(String.Format("\tBuffer[{0}]:{1} != comparable[{0}]:{2}",
-                        i, Buffer[i], comparable[i]));
+                    errors.Add(String.Format("\toriginal[{0}]:{1} != result[{0}]:{2}",
+                        i, original[i], result[i]));
                     break;
                 }
             return errors;

@@ -12,15 +12,25 @@ namespace GLD.QueueBenchmark
             int bufferSize = int.Parse(args[1]);
             Console.WriteLine("Repetitions: " + repetitions);
             Console.WriteLine("Buffer Size: " + bufferSize);
-            var queues = new Dictionary<string, IQueueSender>
+            var senders = new Dictionary<string, IQueueSender>
             {
-                {"MS Azure Queue", new AzureQueue()},
-                {"MS Azure Topic", new AzureTopic()},
-                {"MS MSMQ", new Msmq()},
+                {"MS Azure Queue", new Senders.AzureQueue()},
+                {"MS Azure Topic", new Senders.AzureTopic()},
+                {"MS MSMQ", new Senders.Msmq()},
                 {"NetMQ", new Senders.NetMQ()},
-                {"StackExchange Redis", new StackExchangeRedis()},
+                {"StackExchange Redis", new Senders.StackExchangeRedis()},
             };
-            Tester.SendTests(repetitions, bufferSize, queues);
+            var receivers = new Dictionary<string, IQueueReceiver>
+            {
+                {"MS Azure Queue", new Receivers.AzureQueue()},
+                {"MS Azure Topic", new Receivers.AzureTopic()},
+                {"MS MSMQ", new Receivers.Msmq()},
+                {"NetMQ", new Receivers.NetMQ()},
+                {"StackExchange Redis", new Receivers.StackExchangeRedis()},
+            };
+            Tester.PurgeQueue(receivers);
+            Tester.SendTests(repetitions, bufferSize, senders);
+            Tester.ReceiveTests(repetitions, bufferSize, receivers);
         }
     }
 }
