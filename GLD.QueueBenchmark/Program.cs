@@ -6,7 +6,7 @@ namespace GLD.QueueBenchmark
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main(string[] args )
         {
             int repetitions = int.Parse(args[0]);
             int bufferSize = int.Parse(args[1]);
