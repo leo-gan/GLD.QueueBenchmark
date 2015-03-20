@@ -42,7 +42,7 @@ namespace GLD.QueueBenchmark.Receivers
                 Trace.Write("Exception ****** " + ex.Message);
                 throw;
             }
-            return message.GetBytes();
+            return message == null ? null : message.GetBytes();
         }
 
         public void Purge()

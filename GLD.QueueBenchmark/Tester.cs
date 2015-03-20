@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace GLD.QueueBenchmark
 {
@@ -36,8 +37,6 @@ namespace GLD.QueueBenchmark
                     queue.Value.Send(testBuffers[i]);
                     sw.Stop();
                     measurements[queue.Key][i] = sw.ElapsedTicks;
-                    Trace.WriteLine(String.Format("{0,10}: {1,20}: {2,11:N0}", i, queue.Key,
-                        sw.ElapsedTicks));
                 }
             }
             ReportMeasurments(operation, measurements);
@@ -50,7 +49,8 @@ namespace GLD.QueueBenchmark
                 receiver.Value.Purge();
         }
 
-        public static Dictionary<string, byte[][]> ReceiveTests(string operation, int repetitions, int bufferSize,
+        public static Dictionary<string, byte[][]> ReceiveTests(string operation, int repetitions,
+                                                                int bufferSize,
                                                                 Dictionary<string, IQueueReceiver>
                                                                     queues)
         {
@@ -69,18 +69,34 @@ namespace GLD.QueueBenchmark
                     testBuffers[queue.Key].SetValue(queue.Value.Receive(), i);
                     sw.Stop();
                     measurements[queue.Key][i] = sw.ElapsedTicks;
-                    Trace.WriteLine(String.Format("{0,10}: {1,20}: {2,11:N0}", i, queue.Key,
-                        sw.ElapsedTicks));
                 }
             ReportMeasurments(operation, measurements);
             return testBuffers;
         }
 
-        private static void ReportMeasurments(string operation, Dictionary<string, long[]> measurements)
+        private static void ReportMeasurments(string operation,
+                                              Dictionary<string, long[]> measurements)
         {
+            ReportRawData(operation, measurements);
             ReportHeader(operation);
             foreach (var oneTestMeasurments in measurements)
                 ReportMeasurment(oneTestMeasurments);
+        }
+
+        private static void ReportRawData(string operation, Dictionary<string, long[]> measurements)
+        {
+            var sb = new StringBuilder();
+            sb.Append(operation + ":");
+            foreach (var m in measurements)
+            {
+                sb.Append("\n\t" + m.Key + ":\n\t\t");
+                for (int i = 0; i < m.Value.Length;)
+                {
+                    sb.Append(String.Format("{0,11:N0} ", m.Value[i++]));
+                    if (i%10 == 0) sb.Append("\n\t\t");
+                }
+            }
+            Trace.WriteLine(sb.ToString());
         }
 
         private static void ReportMeasurment(KeyValuePair<string, long[]> oneTestMeasurements)
@@ -95,7 +111,7 @@ namespace GLD.QueueBenchmark
 
         private static void ReportHeader(string operation)
         {
-             string header = "\n" + operation 
+            string header = "\n" + operation
                             + "\nQueue:             Time, ticks: Avg,        Min,          Max\n"
                             + "=============================================================";
 
@@ -162,6 +178,9 @@ namespace GLD.QueueBenchmark
 
         public int Compare(byte[] x, byte[] y)
         {
+            if (x == null && y == null) return 0;
+            if (y == null) return 1;
+            if (x == null) return -1;
             if (x.Length > y.Length) return 1;
             if (x.Length < y.Length) return -1;
             // first  bytes 4 used to store the array id. We try to sort by this id first.
