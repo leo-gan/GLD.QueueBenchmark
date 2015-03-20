@@ -14,6 +14,7 @@ namespace GLD.QueueBenchmark
             Console.WriteLine("Buffer Size: " + bufferSize);
             var senders = new Dictionary<string, IQueueSender>
             {
+                {"MS Azure EventHub", new Senders.AzureEventHub()},
                 {"MS Azure Queue", new Senders.AzureQueue()},
                 {"MS Azure Topic", new Senders.AzureTopic()},
                 {"MS MSMQ", new Senders.Msmq()},
@@ -22,6 +23,7 @@ namespace GLD.QueueBenchmark
             };
             var receivers = new Dictionary<string, IQueueReceiver>
             {
+                {"MS Azure EventHub", new Receivers.AzureEventHub()},
                 {"MS Azure Queue", new Receivers.AzureQueue()},
                 {"MS Azure Topic", new Receivers.AzureTopic()},
                 {"MS MSMQ", new Receivers.Msmq()},
