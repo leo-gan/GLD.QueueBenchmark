@@ -5,6 +5,7 @@
 // Copy the policies from the ServiceBus configuration page into the config files of the sender and receiver applications
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
@@ -51,6 +52,11 @@ namespace GLD.QueueBenchmark.Receivers
                 throw;
             }
             return buffer;
+        }
+
+        public IEnumerable<byte[]> ReceiveBatch(int batchSize)
+        {
+            throw new NotImplementedException();
         }
 
         public void Purge()

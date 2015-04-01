@@ -1,5 +1,6 @@
 ﻿/// PM> Install-Package NetMQ
 
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading;
 using NetMQ;
@@ -28,6 +29,11 @@ namespace GLD.QueueBenchmark.Senders
         {
             _sock.Send(buffer);
             //_sock.Send(buffer, buffer.Length, dontWait:true);
+        }
+
+        public void SendBatch(IEnumerable<byte[]> buffers)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion

@@ -4,8 +4,10 @@
 // Create the Manage, Send and Listen policies
 // Copy the policies from the ServiceBus configuration page into the config files of the sender and receiver applications
 
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using Microsoft.ServiceBus.Messaging;
 
 namespace GLD.QueueBenchmark.Senders
@@ -36,6 +38,11 @@ namespace GLD.QueueBenchmark.Senders
                 _client.SendAsync(brokeredMsg);
           }
 
+        public void SendBatch(IEnumerable<byte[]> buffers)
+        {
+            var brokeredMsgs = buffers.Select(buffer => new BrokeredMessage(buffer)).ToList();
+            _client.SendBatchAsync(brokeredMsgs);
+        }
         #endregion
 
         public void Dispose()

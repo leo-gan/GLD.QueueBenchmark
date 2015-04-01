@@ -4,6 +4,7 @@
 // Create a queue
 // Add queue address to config file. It looks like: ".\private$\queuebenchmark"
 
+using System.Collections.Generic;
 using System.Configuration;
 using System.Messaging;
 
@@ -27,6 +28,11 @@ namespace GLD.QueueBenchmark.Senders
         public void Send(byte[] buffer)
         {
             _q.Send(buffer);
+        }
+
+        public void SendBatch(IEnumerable<byte[]> buffers)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion

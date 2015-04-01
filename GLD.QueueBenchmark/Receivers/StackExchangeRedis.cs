@@ -3,6 +3,7 @@
 /// PM> Install-Package StackExchange.Redis
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using StackExchange.Redis;
@@ -31,6 +32,11 @@ namespace GLD.QueueBenchmark.Receivers
         public byte[] Receive()
         {
             return (byte[])_db.ListRightPop(_queueName);
+        }
+
+        public IEnumerable<byte[]> ReceiveBatch(int batchSize)
+        {
+            throw new NotImplementedException();
         }
 
         public void Purge()
